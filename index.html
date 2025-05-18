@@ -2,12 +2,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const plzInput = document.getElementById("plz");
 
     if (plzInput) {
-        plzInput.addEventListener("change", pruefePLZ);
+        plzInput.addEventListener("input", pruefePLZ);
     }
 });
 
 async function pruefePLZ() {
-    const plz = document.getElementById("plz").value;
+    const plz = document.getElementById("plz")?.value;
     
     let sichtungen = await fetch('sichtungen.json').then(res => res.json());
 
