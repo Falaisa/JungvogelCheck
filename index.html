@@ -1,19 +1,29 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const plzInput = document.getElementById("plz");
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(() => {
+            const plzInput = document.getElementById("plz");
+            if (plzInput) {
+                plzInput.addEventListener("input", pruefePLZ);
+            } else {
+                console.error("Fehler: Das PLZ-Feld wurde nicht gefunden!");
+            }
+        }, 500);
+    });
 
-    if (plzInput) {
-        plzInput.addEventListener("input", pruefePLZ);
+    async function pruefePLZ() {
+        const plz = document.getElementById("plz")?.value;
+        if (!plz) return;
+
+        try {
+            let sichtungen = await fetch('sichtungen.json').then(res => res.json());
+
+            if (sichtungen.some(sichtung => sichtung.plz === plz)) {
+                alert("Es gibt bereits eine Sichtung in dieser PLZ!");
+            } else {
+                alert("Keine Sichtungen gefunden.");
+            }
+        } catch (error) {
+            console.error("Fehler beim Abrufen der Sichtungen:", error);
+        }
     }
-});
-
-async function pruefePLZ() {
-    const plz = document.getElementById("plz")?.value;
-    
-    let sichtungen = await fetch('sichtungen.json').then(res => res.json());
-
-    if (sichtungen.some(sichtung => sichtung.plz === plz)) {
-        alert("Es gibt bereits eine Sichtung in dieser PLZ!");
-    } else {
-        alert("Keine Sichtungen gefunden.");
-    }
-}
+</script>
