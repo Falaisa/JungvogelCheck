@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JungvogelCheck</title>
+    <title>JungvogelCheck – Sichtung erfassen</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
 
-    <h1>JungvogelCheck – PLZ-Sichtung</h1>
+    <h1>JungvogelCheck – Sichtung erfassen</h1>
 
     <label for="plz">Postleitzahl:</label>
     <input type="text" id="plz" name="plz" required>
@@ -16,27 +16,17 @@
     <label for="datum">Datum der Sichtung:</label>
     <input type="date" id="datum" name="datum" required>
     
-    <button onclick="pruefePLZ()">Sichtung prüfen</button>
+    <button onclick="speichernSichtung()">Sichtung erfassen</button>
+
+    <h2>Bestehende Sichtungen</h2>
+    <ul id="sichtungsliste"></ul>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            setTimeout(() => {
-                const plzInput = document.getElementById("plz");
-                if (plzInput) {
-                    plzInput.addEventListener("input", pruefePLZ);
-                } else {
-                    console.error("Fehler: Das PLZ-Feld wurde nicht gefunden!");
-                }
-            }, 500);
+            ladeSichtungen();
         });
 
-        async function pruefePLZ() {
-            const plz = document.getElementById("plz")?.value;
-            if (!plz) {
-                alert("Bitte eine PLZ eingeben!");
-                return;
-            }
-
+        async function ladeSichtungen() {
             try {
                 const response = await fetch('sichtungen.json');
                 if (!response.ok) {
@@ -44,20 +34,36 @@
                 }
 
                 let sichtungen = await response.json();
-
-                if (sichtungen.length === 0) {
-                    alert("Keine Sichtungen gespeichert.");
-                    return;
-                }
-
-                if (sichtungen.some(sichtung => sichtung.plz === plz)) {
-                    alert("✅ Es gibt bereits eine Sichtung in dieser PLZ!");
-                } else {
-                    alert("❌ Keine Sichtungen gefunden.");
-                }
+                const sichtungsliste = document.getElementById("sichtungsliste");
+                sichtungsliste.innerHTML = sichtungen.map(s => `<li>${s.plz} - ${s.datum}</li>`).join("");
             } catch (error) {
                 console.error("Fehler beim Abrufen der Sichtungen:", error);
-                alert("❌ Daten konnten nicht geladen werden.");
+            }
+        }
+
+        async function speichernSichtung() {
+            const plz = document.getElementById("plz").value;
+            const datum = document.getElementById("datum").value;
+            if (!plz || !datum) {
+                alert("Bitte eine PLZ und ein Datum eingeben!");
+                return;
+            }
+
+            try {
+                let sichtungen = await fetch('sichtungen.json').then(res => res.json());
+                sichtungen.push({ plz, datum });
+
+                await fetch('sichtungen.json', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sichtungen)
+                });
+
+                alert("✅ Sichtung gespeichert!");
+                ladeSichtungen();
+            } catch (error) {
+                console.error("Fehler beim Speichern der Sichtung:", error);
+                alert("❌ Sichtung konnte nicht gespeichert werden.");
             }
         }
     </script>
