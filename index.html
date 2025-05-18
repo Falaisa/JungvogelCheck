@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JungvogelCheck</title>
+</head>
+<body>
+    <h1>JungvogelCheck – PLZ-Sichtung</h1>
+    <p>Hier kannst du deine Sichtung melden und prüfen!</p>
+
+    <form id="sichtung-form">
+        <label for="plz">Postleitzahl:</label>
+        <input type="text" id="plz" name="plz" required>
+        
+        <label for="datum">Datum der Sichtung:</label>
+        <input type="date" id="datum" name="datum" required>
+        
+        <button type="submit">Sichtung melden</button>
+    </form>
+
+    <script>
+        document.getElementById("sichtung-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            alert("Sichtung gespeichert!");
+        });
+    </script>
+</body>
+</html>
