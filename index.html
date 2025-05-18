@@ -12,18 +12,32 @@
 
     async function pruefePLZ() {
         const plz = document.getElementById("plz")?.value;
-        if (!plz) return;
+        if (!plz) {
+            alert("Bitte eine PLZ eingeben!");
+            return;
+        }
 
         try {
-            let sichtungen = await fetch('sichtungen.json').then(res => res.json());
+            const response = await fetch('sichtungen.json');
+            if (!response.ok) {
+                throw new Error(`Fehler beim Laden der Daten: ${response.status}`);
+            }
+
+            let sichtungen = await response.json();
+
+            if (sichtungen.length === 0) {
+                alert("Keine Sichtungen gespeichert.");
+                return;
+            }
 
             if (sichtungen.some(sichtung => sichtung.plz === plz)) {
-                alert("Es gibt bereits eine Sichtung in dieser PLZ!");
+                alert("✅ Es gibt bereits eine Sichtung in dieser PLZ!");
             } else {
-                alert("Keine Sichtungen gefunden.");
+                alert("❌ Keine Sichtungen gefunden.");
             }
         } catch (error) {
             console.error("Fehler beim Abrufen der Sichtungen:", error);
+            alert("❌ Daten konnten nicht geladen werden.");
         }
     }
 </script>
