@@ -1,24 +1,19 @@
-<script>
-    async function speichernSichtung() {
-        const plz = document.getElementById("plz").value;
-        const datum = document.getElementById("datum").value;
+document.addEventListener("DOMContentLoaded", function () {
+    const plzInput = document.getElementById("plz");
 
-        const neueSichtung = { plz, datum };
-
-        let sichtungen = await fetch('sichtungen.json').then(res => res.json());
-        sichtungen.push(neueSichtung);
-
-        await fetch('sichtungen.json', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(sichtungen)
-        });
-
-        alert("Sichtung gespeichert!");
+    if (plzInput) {
+        plzInput.addEventListener("change", pruefePLZ);
     }
+});
 
-    document.getElementById("sichtung-form").addEventListener("submit", function(event) {
-        event.preventDefault();
-        speichernSichtung();
-    });
-</script>
+async function pruefePLZ() {
+    const plz = document.getElementById("plz").value;
+    
+    let sichtungen = await fetch('sichtungen.json').then(res => res.json());
+
+    if (sichtungen.some(sichtung => sichtung.plz === plz)) {
+        alert("Es gibt bereits eine Sichtung in dieser PLZ!");
+    } else {
+        alert("Keine Sichtungen gefunden.");
+    }
+}
